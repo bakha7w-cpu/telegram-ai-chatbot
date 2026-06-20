@@ -396,7 +396,10 @@ _DEFAULT_ADMIN_PERMS = {
 
 # All non-channel permissions (used by the "full" flag)
 _FULL_ADMIN_PERMS = {
+    "is_anonymous":           False,
     "can_manage_chat":        True,
+    "can_post_messages":      True,
+    "can_edit_messages":      True,
     "can_delete_messages":    True,
     "can_manage_video_chats": True,
     "can_restrict_members":   True,
@@ -405,6 +408,10 @@ _FULL_ADMIN_PERMS = {
     "can_invite_users":       True,
     "can_pin_messages":       True,
     "can_manage_topics":      True,
+    "can_manage_tags":        True,
+    "can_delete_stories":     True,
+    "can_edit_stories":       True,
+    "can_post_stories":       True,
 }
 
 
@@ -592,14 +599,14 @@ def _feed_keyboard(entry: "state.FeedEntry") -> InlineKeyboardMarkup:
     uid = entry.user_id
     return InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("↩️ Reply",  callback_data=f"fd:rep:{cid}:{mid}"),
-            InlineKeyboardButton("🗑️ Del",    callback_data=f"fd:del:{cid}:{mid}"),
-            InlineKeyboardButton("📌 Pin",    callback_data=f"fd:pin:{cid}:{mid}"),
+            InlineKeyboardButton("\u21A9\uFE0F Reply",  callback_data=f"fd:rep:{cid}:{mid}"),
+            InlineKeyboardButton("\U0001F5D1\uFE0F Del",    callback_data=f"fd:del:{cid}:{mid}"),
+            InlineKeyboardButton("\U0001F4CC Pin",    callback_data=f"fd:pin:{cid}:{mid}"),
         ],
         [
-            InlineKeyboardButton("⚠️ Warn",  callback_data=f"fd:warn:{cid}:{uid}"),
-            InlineKeyboardButton("🔇 Mute",  callback_data=f"fd:mute:{cid}:{uid}"),
-            InlineKeyboardButton("🚫 Ban",   callback_data=f"fd:ban:{cid}:{uid}"),
+            InlineKeyboardButton("\u26A0\uFE0F Warn",  callback_data=f"fd:warn:{cid}:{uid}"),
+            InlineKeyboardButton("\U0001F507 Mute",  callback_data=f"fd:mute:{cid}:{uid}"),
+            InlineKeyboardButton("\U0001F6AB Ban",   callback_data=f"fd:ban:{cid}:{uid}"),
         ],
     ])
 
