@@ -574,34 +574,18 @@ async def tg_promote_admin(ctx: TelegramContext, user_id: int,
                             chat_id=None, custom_title: str = "", **kwargs) -> str:
     target = _resolve_chat(ctx, chat_id)
     try:
-        # 1. Định nghĩa chính xác những tham số mà ExtBot chấp nhận
-        allowed_keys = {
-            "can_delete_messages",
-            "can_manage_topics",
-            "can_pin_messages",
-            "can_invite_users",
-            "can_restrict_members",
-            "can_change_info",
-            "can_post_messages",
-            "can_edit_messages",
-            "can_promote_members",
-            "can_manage_video_chats"
-        }
-        
-        # 2. Đóng gói các quyền hợp lệ
+        # Chỉ giữ lại đúng 2 tham số này để ExtBot trên Render không bao giờ chửi unexpected argument
         admin_rights = {
             "chat_id": target,
             "user_id": int(user_id),
         }
-        
-        # 3. Lọc lấy những quyền hợp lệ từ AI truyền xuống
+        # Chỉ nạp quyền nếu nó nằm trong bộ quyền cơ bản, ép loại bỏ hoàn toàn can_manage_tags
+        allowed_keys = {"can_delete_messages", "can_manage_topics", "can_pin_messages", "can_invite_users", "can_restrict_members"}
         for k, v in kwargs.items():
             if k in allowed_keys:
                 admin_rights[k] = bool(v)
                 
-        # 4. Thực hiện lệnh nâng quyền với các tham số sạch
         await ctx.bot.promote_chat_member(**admin_rights)
-        
         if custom_title:
             await ctx.bot.set_chat_administrator_custom_title(
                 chat_id=target, user_id=int(user_id), custom_title=custom_title[:16]
@@ -611,15 +595,6 @@ async def tg_promote_admin(ctx: TelegramContext, user_id: int,
         logger.error("tg_promote_admin failed: %s", e)
         return f"❌ Promote thất bại: {e}"
         
-
-async def tg_set_chat_description(ctx: TelegramContext, description: str,
-                                   chat_id=None) -> str:
-    target = _resolve_chat(ctx, chat_id)
-    try:
-        await ctx.bot.set_chat_description(chat_id=target, description=description[:255])
-        return f"✅ Đã cập nhật mô tả chat."
-    except Exception as e:
-        return f"❌ Cập nhật mô tả thất bại: {e}"
 
 
 # ─────────────────────────────────────────────────────────────
