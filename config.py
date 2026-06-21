@@ -10,7 +10,7 @@ WEBHOOK_SECRET: str = os.getenv("WEBHOOK_SECRET", "")
 
 # ── PostgreSQL ────────────────────────────────────────────────────────────
 DATABASE_URL: str  = os.getenv("DATABASE_URL", "")
-MAX_CONV_ROWS: int = int(os.getenv("MAX_CONV_ROWS", "10000000"))
+MAX_CONV_ROWS: int = int(os.getenv("MAX_CONV_ROWS", "10000"))
 
 # ── Gemini ────────────────────────────────────────────────────────────────
 GEMINI_KEYS: list[str] = [

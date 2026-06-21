@@ -251,7 +251,24 @@ TG_TOOL_DECLS = [
             "required": ["emoji"],
         },
     },
-    
+    {
+        "name": "tg_promote_admin",
+        "description": "Promote a user to admin with configurable permissions (owner only).",
+        "parameters": {
+            "type": "OBJECT",
+            "properties": {
+                "user_id":                {"type": "NUMBER"},
+                "chat_id":                {"type": "STRING"},
+                "can_delete_messages":    {"type": "BOOLEAN"},
+                "can_manage_topics":      {"type": "BOOLEAN"},
+                "can_pin_messages":       {"type": "BOOLEAN"},
+                "can_invite_users":       {"type": "BOOLEAN"},
+                "can_restrict_members":   {"type": "BOOLEAN"},
+                "custom_title":           {"type": "STRING", "description": "Custom admin title"},
+            },
+            "required": ["user_id"],
+        },
+    },
     {
         "name": "tg_demote_admin",
         "description": "Remove all admin rights from a user.",
@@ -276,22 +293,6 @@ TG_TOOL_DECLS = [
             "required": ["title"],
         },
     },
-
-            {
-        "name": "tg_promote_admin",
-        "description": "Promote a user to admin with standard permissions (owner only).",
-        "parameters": {
-            "type": "OBJECT",
-            "properties": {
-                "user_id":      {"type": "NUMBER", "description": "User ID to promote"},
-                "chat_id":      {"type": "STRING", "description": "Chat ID (optional)"},
-                "custom_title": {"type": "STRING", "description": "Custom admin title (optional)"},
-            },
-            "required": ["user_id"],
-        },
-    },
-    
-    
     {
         "name": "tg_set_chat_description",
         "description": "Set or update the description of a group or channel.",
@@ -562,30 +563,73 @@ async def tg_send_dice(ctx: TelegramContext, emoji: str,
 
 
 async def tg_promote_admin(ctx: TelegramContext, user_id: int,
-                            chat_id=None, custom_title: str = "", **kwargs) -> str:
+                            chat_id=None,
+                            can_delete_messages: bool = True,
+                            can_manage_topics:   bool = False,
+                            can_pin_messages:    bool = True,
+                            can_invite_users:    bool = True,
+                            can_restrict_members:bool = False,
+                            custom_title: str    = "") -> str:
     target = _resolve_chat(ctx, chat_id)
     try:
-        # Chỉ giữ lại đúng 2 tham số này để ExtBot trên Render không bao giờ chửi unexpected argument
-        admin_rights = {
-            "chat_id": target,
-            "user_id": int(user_id),
-        }
-        # Chỉ nạp quyền nếu nó nằm trong bộ quyền cơ bản, ép loại bỏ hoàn toàn can_manage_tags
-        allowed_keys = {"can_delete_messages", "can_manage_topics", "can_pin_messages", "can_invite_users", "can_restrict_members"}
-        for k, v in kwargs.items():
-            if k in allowed_keys:
-                admin_rights[k] = bool(v)
-                
-        await ctx.bot.promote_chat_member(**admin_rights)
+        await ctx.bot.promote_chat_member(
+            chat_id               = target,
+            user_id               = int(user_id),
+            can_delete_messages   = can_delete_messages,
+            can_manage_topics     = can_manage_topics,
+            can_pin_messages      = can_pin_messages,
+            can_invite_users      = can_invite_users,
+            can_restrict_members  = can_restrict_members,
+            can_manage_chat       = True,
+        )
         if custom_title:
             await ctx.bot.set_chat_administrator_custom_title(
                 chat_id=target, user_id=int(user_id), custom_title=custom_title[:16]
             )
-        return f"✅ Đã gán quyền admin cho user {user_id} thành công."
+        return f"✅ Đã promote user {user_id} thành admin."
     except Exception as e:
-        logger.error("tg_promote_admin failed: %s", e)
         return f"❌ Promote thất bại: {e}"
-        
+
+
+async def tg_demote_admin(ctx: TelegramContext, user_id: int,
+                           chat_id=None) -> str:
+    target = _resolve_chat(ctx, chat_id)
+    try:
+        await ctx.bot.promote_chat_member(
+            chat_id               = target,
+            user_id               = int(user_id),
+            can_manage_chat       = False,
+            can_delete_messages   = False,
+            can_manage_video_chats= False,
+            can_restrict_members  = False,
+            can_promote_members   = False,
+            can_change_info       = False,
+            can_invite_users      = False,
+            can_pin_messages      = False,
+        )
+        return f"✅ Đã demote user {user_id} (xóa quyền admin)."
+    except Exception as e:
+        return f"❌ Demote thất bại: {e}"
+
+
+async def tg_set_chat_title(ctx: TelegramContext, title: str,
+                             chat_id=None) -> str:
+    target = _resolve_chat(ctx, chat_id)
+    try:
+        await ctx.bot.set_chat_title(chat_id=target, title=title[:255])
+        return f"✅ Đã đổi tên chat thành '{title}'."
+    except Exception as e:
+        return f"❌ Đổi tên thất bại: {e}"
+
+
+async def tg_set_chat_description(ctx: TelegramContext, description: str,
+                                   chat_id=None) -> str:
+    target = _resolve_chat(ctx, chat_id)
+    try:
+        await ctx.bot.set_chat_description(chat_id=target, description=description[:255])
+        return f"✅ Đã cập nhật mô tả chat."
+    except Exception as e:
+        return f"❌ Cập nhật mô tả thất bại: {e}"
 
 
 # ─────────────────────────────────────────────────────────────
