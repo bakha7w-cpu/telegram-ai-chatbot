@@ -251,24 +251,7 @@ TG_TOOL_DECLS = [
             "required": ["emoji"],
         },
     },
-    {
-        "name": "tg_promote_admin",
-        "description": "Promote a user to admin with configurable permissions (owner only).",
-        "parameters": {
-            "type": "OBJECT",
-            "properties": {
-                "user_id":                {"type": "NUMBER"},
-                "chat_id":                {"type": "STRING"},
-                "can_delete_messages":    {"type": "BOOLEAN"},
-                "can_manage_topics":      {"type": "BOOLEAN"},
-                "can_pin_messages":       {"type": "BOOLEAN"},
-                "can_invite_users":       {"type": "BOOLEAN"},
-                "can_restrict_members":   {"type": "BOOLEAN"},
-                "custom_title":           {"type": "STRING", "description": "Custom admin title"},
-            },
-            "required": ["user_id"],
-        },
-    },
+    
     {
         "name": "tg_demote_admin",
         "description": "Remove all admin rights from a user.",
@@ -293,6 +276,31 @@ TG_TOOL_DECLS = [
             "required": ["title"],
         },
     },
+
+        {
+        "name": "tg_promote_admin",
+        "description": "Promote a user to admin with full permissions (owner only).",
+        "parameters": {
+            "type": "OBJECT",
+            "properties": {
+                "user_id":                {"type": "NUMBER"},
+                "chat_id":                {"type": "STRING"},
+                "can_delete_messages":    {"type": "BOOLEAN"},
+                "can_manage_topics":      {"type": "BOOLEAN"},
+                "can_pin_messages":       {"type": "BOOLEAN"},
+                "can_invite_users":       {"type": "BOOLEAN"},
+                "can_restrict_members":   {"type": "BOOLEAN"},
+                "can_change_info":        {"type": "BOOLEAN"},
+                "can_post_messages":      {"type": "BOOLEAN"},
+                "can_edit_messages":      {"type": "BOOLEAN"},
+                "can_promote_members":    {"type": "BOOLEAN"},
+                "can_manage_video_chats": {"type": "BOOLEAN"},
+                "custom_title":           {"type": "STRING", "description": "Custom admin title"},
+            },
+            "required": ["user_id"],
+        },
+    },
+    
     {
         "name": "tg_set_chat_description",
         "description": "Set or update the description of a group or channel.",
