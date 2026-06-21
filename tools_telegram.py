@@ -572,23 +572,34 @@ async def tg_promote_admin(ctx: TelegramContext, user_id: int,
                             custom_title: str    = "") -> str:
     target = _resolve_chat(ctx, chat_id)
     try:
-        await ctx.bot.promote_chat_member(
-            chat_id               = target,
-            user_id               = int(user_id),
-            can_delete_messages   = can_delete_messages,
-            can_manage_topics     = can_manage_topics,
-            can_pin_messages      = can_pin_messages,
-            can_invite_users      = can_invite_users,
-            can_restrict_members  = can_restrict_members,
-            can_manage_chat       = True,
-        )
+        # Bộ quyền chuẩn hóa full Admin cho thư viện đời mới trên Render
+        admin_rights = {
+            "chat_id": target,
+            "user_id": int(user_id),
+            "can_delete_messages": can_delete_messages,
+            "can_manage_topics": can_manage_topics,
+            "can_pin_messages": can_pin_messages,
+            "can_invite_users": can_invite_users,
+            "can_restrict_members": can_restrict_members,
+            # Thay vì can_manage_chat, các bản mới dùng các quyền chi tiết này để làm Admin full:
+            "can_change_info": True,
+            "can_post_messages": True,
+            "can_edit_messages": True,
+            "can_promote_members": True,
+            "can_manage_video_chats": True,
+        }
+        
+        await ctx.bot.promote_chat_member(**admin_rights)
+        
         if custom_title:
             await ctx.bot.set_chat_administrator_custom_title(
                 chat_id=target, user_id=int(user_id), custom_title=custom_title[:16]
             )
-        return f"✅ Đã promote user {user_id} thành admin."
+        return f"✅ Đã gán quyền admin cho user {user_id} thành công."
     except Exception as e:
+        logger.error("tg_promote_admin failed: %s", e)
         return f"❌ Promote thất bại: {e}"
+        
 
 
 async def tg_demote_admin(ctx: TelegramContext, user_id: int,
