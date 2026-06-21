@@ -574,7 +574,7 @@ async def tg_promote_admin(ctx: TelegramContext, user_id: int,
                             chat_id=None, custom_title: str = "", **kwargs) -> str:
     target = _resolve_chat(ctx, chat_id)
     try:
-        # 1. Định nghĩa chính xác những tham số mà ExtBot chấp nhận (tuyệt đối không có can_manage_tags)
+        # 1. Định nghĩa chính xác những tham số mà ExtBot chấp nhận
         allowed_keys = {
             "can_delete_messages",
             "can_manage_topics",
@@ -594,7 +594,7 @@ async def tg_promote_admin(ctx: TelegramContext, user_id: int,
             "user_id": int(user_id),
         }
         
-        # 3. Chỉ lọc lấy những quyền hợp lệ từ AI truyền xuống, bỏ qua hoàn toàn tham số lỗi
+        # 3. Lọc lấy những quyền hợp lệ từ AI truyền xuống
         for k, v in kwargs.items():
             if k in allowed_keys:
                 admin_rights[k] = bool(v)
